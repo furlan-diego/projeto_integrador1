@@ -1,54 +1,45 @@
 <?php
-header('Content-Type: application/json');
-
-$response = [];
-
+// Verifica se os dados foram enviados via POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // --- INFORMAÇÕES IMPORTANTES ---
-    // Substitua este e-mail pelo e-mail que receberá as mensagens do formulário
-    $destinatario = "diefurlann@hotmail.com"; 
 
-    // --- COLETA E LIMPEZA DOS DADOS ---
-    // Usamos filter_input para mais segurança contra ataques como XSS
-    $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    $telefone = filter_input(INPUT_POST, 'telefone', FILTER_SANITIZE_SPECIAL_CHARS);
-    $mensagem = filter_input(INPUT_POST, 'mensagem', FILTER_SANITIZE_SPECIAL_CHARS);
+    // 1. Pegando os dados do formulário
+    // A variável superglobal $_POST é um array que contém os dados enviados.
+    // Usamos o 'name' de cada campo do formulário como chave para pegar o valor.
+    $nome = $_POST['nome'];
+    $email_remetente = $_POST['email'];
+    $assunto = $_POST['assunto'];
+    $mensagem = $_POST['mensagem'];
 
-    // --- VALIDAÇÃO DOS DADOS ---
-    if (!$nome || !$email || !$telefone || !$mensagem) {
-        $response['status'] = 'error';
-        $response['message'] = 'Dados inválidos ou faltando. Por favor, preencha o formulário corretamente.';
-        echo json_encode($response);
-        exit;
-    }
+    // 2. Montando o e-mail
+    $destinatario = "seu-email@dominio.com"; // <-- MUITO IMPORTANTE: Coloque aqui o seu e-mail!
 
-    // --- MONTAGEM DO E-MAIL ---
-    $assunto = "Nova mensagem do site É de Casa' de: $nome";
-    
-    $corpo_email = "Você recebeu uma nova mensagem do seu site.\n\n";
-    $corpo_email .= "Nome: $nome\n";
-    $corpo_email .= "Email: $email\n";
-    $corpo_email .= "Telefone: $telefone\n";
-    $corpo_email .= "Mensagem:\n$mensagem\n";
+    // Corpo do e-mail que você vai receber
+    $corpo_email = "Você recebeu uma nova mensagem de contato:\n\n";
+    $corpo_email .= "Nome: " . $nome . "\n";
+    $corpo_email .= "Email: " . $email_remetente . "\n";
+    $corpo_email .= "Assunto: " . $assunto . "\n";
+    $corpo_email .= "Mensagem:\n" . $mensagem;
 
-    // Cabeçalhos do e-mail
-    $headers = "From: nao-responda@seudominio.com\r\n"; // Use um e-mail do seu domínio de hospedagem
-    $headers .= "Reply-To: $email\r\n";
-    $headers .= "Content-type: text/plain; charset=UTF-8\r\n";
+    // Cabeçalhos do e-mail (para garantir que seja enviado corretamente)
+    $headers = "From: " . $email_remetente . "\r\n";
+    $headers .= "Reply-To: " . $email_remetente . "\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
 
-    // --- ENVIO DO E-MAIL ---
+    // 3. Enviando o e-mail
+    // A função mail() é a função nativa do PHP para enviar e-mails.
+    // Ela retorna 'true' se o envio foi bem-sucedido e 'false' se falhou.
     if (mail($destinatario, $assunto, $corpo_email, $headers)) {
-        $response['status'] = 'success';
-        $response['message'] = 'Mensagem enviada com sucesso! Entraremos em contato em breve.';
+        echo "<h1>Mensagem enviada com sucesso!</h1>";
+        echo "<p>Obrigado por entrar em contato, " . $nome . ". Responderemos em breve.</p>";
+        echo "<a href='index.php'>Voltar para a Homepage</a>";
     } else {
-        $response['status'] = 'error';
-        $response['message'] = 'Desculpe, ocorreu um erro ao tentar enviar sua mensagem. Tente novamente mais tarde.';
+        echo "<h1>Falha no envio do e-mail.</h1>";
+        echo "<p>Desculpe, ocorreu um erro. Por favor, tente novamente mais tarde.</p>";
+        echo "<a href='index.php'>Voltar para a Homepage</a>";
     }
-} else {
-    $response['status'] = 'error';
-    $response['message'] = 'Método de requisição inválido.';
-}
 
-echo json_encode($response);
-?>
+} else {
+    // Se alguém tentar acessar este arquivo diretamente pelo navegador, sem enviar o formulário
+    echo "<h1>Acesso Negado!</h1>";
+    echo "<p>Esta página deve ser acessada através do formulário de contato.</p>";
+}
