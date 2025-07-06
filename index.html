@@ -99,12 +99,10 @@
                 </div>
             </div>
         </section>
-
-        <form id="contact-form" class="container" action="enviar_email.php" method="post">
-            <h2>Entre em Contato</h2>
-            <p>Tem alguma dúvida ou sugestão? Quer fazer uma reserva? Mande uma mensagem!</p>
-
-            <form id="contact-form">
+        <section id="contato">
+            <form id="contact-form" class="container" action="enviar_email.php" method="post">
+                <h2>Entre em Contato</h2>
+                <p>Tem alguma dúvida ou sugestão? Quer fazer uma reserva? Mande uma mensagem!</p>
                 <div id="form-message"></div>
                 <input type="text" id="nome" name="nome" placeholder="Seu Nome" required>
                 <input type="email" id="email" name="email" placeholder="Seu E-mail" required>
@@ -112,7 +110,7 @@
                 <textarea id="mensagem" name="mensagem" rows="5" placeholder="Sua Mensagem" required></textarea>
                 <button type="submit" class="btn">Enviar Mensagem</button>
             </form><br>
-            </section>
+        </section>
     </main>
 
     <footer>
